@@ -592,9 +592,7 @@ module Google
       connection = options[:connection] || self.connection
       request.authorization = options[:authorization] || self.authorization unless options[:authenticated] == false
       tries = 1 + (options[:retries] || self.retries)
-      Retriable.retriable :tries => tries, 
-                          :on => [TransmissionError], 
-                          :interval => lambda {|attempts| (2 ** attempts) + rand} do
+      Retriable.retriable(:tries => tries, :on => [TransmissionError], :base_interval => 1, :multiplier => 2, :rand_factor => rand) do
         result = request.send(connection, true)
 
         case result.status
